@@ -20,14 +20,14 @@ module.exports = async (req, res) => {
     const findAccount = await procedure.findAccount({ email: value.email });
 
     if (findAccount === false) {
-      return httpResponse(res, 400, "Failed create account", null);
+      return httpResponse(res, 400, "Gagal membuat akun", null);
     }
 
     if (findAccount) {
       return httpResponse(
         res,
         400,
-        "Failed create account, email is taken",
+        "Gagal membuat akun, email sudah terdaftar",
         null
       );
     }
@@ -36,10 +36,10 @@ module.exports = async (req, res) => {
     const createUser = await procedure.createAccount(value);
 
     if (!createUser) {
-      return httpResponse(res, 400, "Failed create account", null);
+      return httpResponse(res, 400, "Gagal membuat akun", null);
     }
 
-    return httpResponse(res, 200, "Success create account", null);
+    return httpResponse(res, 200, "Sukses membuat akun", null);
   } catch (error) {
     return httpResponse(res, 500, error, null);
   }

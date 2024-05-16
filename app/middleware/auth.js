@@ -1,6 +1,6 @@
-const { verifyJwt } = require("../utils/jwt");
+const { verifyJwt } = require("../helper/jwt");
 const procedure = require("../procedure");
-const httpResponse = require("../utils/httpResponse");
+const httpResponse = require("../helper/httpResponse");
 
 module.exports = {
   authorization: async (req, res, next) => {
@@ -15,7 +15,7 @@ module.exports = {
         throw new Error();
       }
 
-      const user = await procedure.findAccount(data.decoded);
+      const user = await procedure.findAccountById(data.decoded);
 
       if (!user) {
         throw new Error();
@@ -26,7 +26,7 @@ module.exports = {
 
       next();
     } catch (error) {
-      httpResponse(res, 401, "Not Authorized to access this resource", null);
+      httpResponse(res, 401, "Kamu tidak punya akses ke resource ini!", null);
     }
   },
 };

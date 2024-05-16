@@ -19,20 +19,34 @@ module.exports = async (req, res) => {
     const account = await procedure.findAccount({ email: value.email });
 
     if (!account) {
-      return httpResponse(res, 400, "Invalid email or password", null);
+      return httpResponse(
+        res,
+        400,
+        "Email atau password yang anda masukkan salah",
+        null
+      );
+    }
+
+    if (account.status === 0) {
+      return httpResponse(res, 400, "Akun anda sudah tidak aktif", null);
     }
 
     const comparePassword = checkPassword(value.password, account.password);
 
     if (!comparePassword) {
-      return httpResponse(res, 400, "Invalid email or Password", null);
+      return httpResponse(
+        res,
+        400,
+        "Email atau password yang anda masukkan salah",
+        null
+      );
     }
 
     delete account.password;
 
     const token = signJwt({ ...account });
 
-    return httpResponse(res, 200, "Login Success", token);
+    return httpResponse(res, 200, "Berhasil login", token);
   } catch (error) {
     console.log(error);
     return httpResponse(res, 500, error, null);
