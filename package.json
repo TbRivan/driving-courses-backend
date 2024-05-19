@@ -1,7 +1,7 @@
 {
-  "name": "car-rent-backend",
+  "name": "driving-courses-backend",
   "version": "1.0.0",
-  "description": "This project is for rent a car",
+  "description": "This project is for driving courses",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

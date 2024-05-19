@@ -20,4 +20,38 @@ module.exports = (app) => {
     middleware.authorization,
     controller.changeStatusAccount
   );
+
+  // Package
+  app.post(
+    "/api/package/create-package",
+    middleware.authorization,
+    controller.createPackage
+  );
+  app.post(
+    "/api/package/edit-package",
+    middleware.authorization,
+    controller.editPackage
+  );
+  app.post(
+    "/api/package/disable-package",
+    middleware.authorization,
+    controller.disablePackage
+  );
+
+  // Order
+  app.post(
+    "/api/order/create-order",
+    middleware.authorization,
+    controller.createOrder
+  );
+  app.post(
+    "/api/order/edit-remain-order",
+    middleware.authorization,
+    controller.editRemainOrder
+  );
+  app.post(
+    "/api/order/disable-order",
+    middleware.authorization,
+    controller.disableOrder
+  );
 };
