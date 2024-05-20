@@ -11,7 +11,7 @@
  Target Server Version : 80036 (8.0.36)
  File Encoding         : 65001
 
- Date: 19/05/2024 21:40:43
+ Date: 20/05/2024 21:53:21
 */
 
 SET NAMES utf8mb4;
@@ -40,6 +40,52 @@ INSERT INTO `account` VALUES (7, 'admin', 1, 'admin@gmail.com', '$2b$10$MKlmJjaJ
 INSERT INTO `account` VALUES (8, 'user', 2, 'user@gmail.com', '$2b$10$RPGXu6qGZyt1tcaoFix/oe26YVB2pH6YuX6rS.61.u2OebaldxGtK', 1, '2024-05-16 15:46:13', '2024-05-16 15:46:13');
 
 -- ----------------------------
+-- Table structure for course_time
+-- ----------------------------
+DROP TABLE IF EXISTS `course_time`;
+CREATE TABLE `course_time`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `time` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of course_time
+-- ----------------------------
+INSERT INTO `course_time` VALUES (1, '08:00 - 09:00');
+INSERT INTO `course_time` VALUES (2, '09:00 - 10:00');
+INSERT INTO `course_time` VALUES (3, '10:00 - 11:00');
+INSERT INTO `course_time` VALUES (4, '11:00 - 12:00');
+INSERT INTO `course_time` VALUES (5, '12:00 - 13:00');
+INSERT INTO `course_time` VALUES (6, '13:00 - 14:00');
+INSERT INTO `course_time` VALUES (7, '14:00 - 15:00');
+INSERT INTO `course_time` VALUES (8, '15:00 - 16:00');
+INSERT INTO `course_time` VALUES (9, '16:00 - 17:00');
+
+-- ----------------------------
+-- Table structure for courses
+-- ----------------------------
+DROP TABLE IF EXISTS `courses`;
+CREATE TABLE `courses`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `order_id` int NULL DEFAULT NULL,
+  `course_time` int NULL DEFAULT NULL,
+  `admin_accepted` int NULL DEFAULT 0 COMMENT '0 = Non Accepted; 1 = Accepted',
+  `createdAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FK_Order`(`order_id` ASC) USING BTREE,
+  INDEX `FK_Course_Time`(`course_time` ASC) USING BTREE,
+  CONSTRAINT `FK_Course_Time` FOREIGN KEY (`course_time`) REFERENCES `course_time` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FK_Order` FOREIGN KEY (`order_id`) REFERENCES `order` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of courses
+-- ----------------------------
+INSERT INTO `courses` VALUES (1, 3, 1, 1, '2024-05-20 21:21:22', '2024-05-20 21:37:23');
+
+-- ----------------------------
 -- Table structure for order
 -- ----------------------------
 DROP TABLE IF EXISTS `order`;
@@ -56,13 +102,12 @@ CREATE TABLE `order`  (
   INDEX `FK_package`(`package_id` ASC) USING BTREE,
   CONSTRAINT `FK_package` FOREIGN KEY (`package_id`) REFERENCES `package` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `FK_User` FOREIGN KEY (`account_id`) REFERENCES `account` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of order
 -- ----------------------------
-INSERT INTO `order` VALUES (1, 8, 1, 3, 1, '2024-05-19 20:37:49', '2024-05-19 21:03:16');
-INSERT INTO `order` VALUES (2, 8, 2, 10, 1, '2024-05-19 21:23:54', '2024-05-19 21:28:04');
+INSERT INTO `order` VALUES (3, 8, 4, 4, 1, '2024-05-20 21:04:22', '2024-05-20 21:39:47');
 
 -- ----------------------------
 -- Table structure for package
@@ -73,7 +118,7 @@ CREATE TABLE `package`  (
   `name_package` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
   `time_package` int NULL DEFAULT NULL,
-  `type_car` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `type_car` int NULL DEFAULT NULL,
   `price` int NULL DEFAULT NULL,
   `createdBy` int NULL DEFAULT NULL,
   `updatedBy` int NULL DEFAULT NULL,
@@ -83,15 +128,33 @@ CREATE TABLE `package`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `FK_created`(`createdBy` ASC) USING BTREE,
   INDEX `FK_updated`(`updatedBy` ASC) USING BTREE,
-  CONSTRAINT `FK_created` FOREIGN KEY (`createdBy`) REFERENCES `account` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `FK_updated` FOREIGN KEY (`updatedBy`) REFERENCES `account` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+  INDEX `FK_TypeCar`(`type_car` ASC) USING BTREE,
+  CONSTRAINT `FK_CreatedBy` FOREIGN KEY (`createdBy`) REFERENCES `account` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FK_TypeCar` FOREIGN KEY (`type_car`) REFERENCES `type_car` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FK_UpdatedBy` FOREIGN KEY (`updatedBy`) REFERENCES `account` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of package
 -- ----------------------------
-INSERT INTO `package` VALUES (1, 'test', 'this is for test', 10, 'manual', 1000000, 7, 7, 0, '2024-05-16 16:45:37', '2024-05-18 17:38:53');
-INSERT INTO `package` VALUES (2, 'test', 'this is for test', 10, 'manual', 1000000, 7, NULL, 1, '2024-05-18 16:46:49', '2024-05-18 16:46:49');
+INSERT INTO `package` VALUES (4, 'Manual 12 Pertemuan', 'Pelatihan mobil manual untuk 12x pertemuan', 10, 1, 1000000, 7, 7, 1, '2024-05-20 21:03:20', '2024-05-20 21:03:20');
+
+-- ----------------------------
+-- Table structure for type_car
+-- ----------------------------
+DROP TABLE IF EXISTS `type_car`;
+CREATE TABLE `type_car`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `type_car` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of type_car
+-- ----------------------------
+INSERT INTO `type_car` VALUES (1, 'manual');
+INSERT INTO `type_car` VALUES (2, 'matic');
+INSERT INTO `type_car` VALUES (3, 'manual & matic');
 
 -- ----------------------------
 -- Procedure structure for accept_training_admin
@@ -167,6 +230,29 @@ END
 delimiter ;
 
 -- ----------------------------
+-- Procedure structure for change_status_course_by_admin
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `change_status_course_by_admin`;
+delimiter ;;
+CREATE PROCEDURE `change_status_course_by_admin`(IN `_course_id` INT,
+	IN `_status_course` INT)
+BEGIN
+
+	DECLARE _order_id INT;
+	
+	SELECT order_id INTO _order_id
+	FROM `courses`
+	WHERE id = _course_id;
+	
+	UPDATE `courses` SET admin_accepted = _status_course WHERE id = _course_id;
+	
+	CALL accept_training_admin(_order_id);
+
+END
+;;
+delimiter ;
+
+-- ----------------------------
 -- Procedure structure for create_account
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `create_account`;
@@ -178,6 +264,21 @@ CREATE PROCEDURE `create_account`(IN `_name` VARCHAR(50),
 BEGIN
 	
 	INSERT INTO account (name, role, email, password) VALUES (_name, _role, _email, _password);
+
+END
+;;
+delimiter ;
+
+-- ----------------------------
+-- Procedure structure for create_courses_by_account
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `create_courses_by_account`;
+delimiter ;;
+CREATE PROCEDURE `create_courses_by_account`(IN `_order_id` INT,
+	IN `_course_time` INT)
+BEGIN
+	
+	INSERT INTO courses (order_id, course_time) VALUES (_order_id, _course_time);
 
 END
 ;;
@@ -214,7 +315,7 @@ delimiter ;;
 CREATE PROCEDURE `create_package`(IN `_name_package` VARCHAR(255),
 	IN `_description` TEXT,
 	IN `_time_package` INT,
-	IN `_type_car` VARCHAR(50),
+	IN `_type_car` INT,
 	IN `_price` INT,
 	IN `_createdBy` INT)
 BEGIN
@@ -296,7 +397,7 @@ CREATE PROCEDURE `edit_package`(IN `_id_package` INT,
 	IN `_name_package` VARCHAR(255),
 	IN `_description` TEXT,
 	IN `_time_package` INT,
-	IN `_type_car` VARCHAR(50),
+	IN `_type_car` INT,
 	IN `_price` INT,
 	IN `_updatedBy` INT)
 BEGIN
