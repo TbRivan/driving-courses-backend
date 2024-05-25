@@ -15,4 +15,8 @@ module.exports = {
   createOrder: require("./order/createOrder"),
   disableOrder: require("./order/disableOrder"),
   editRemainOrder: require("./order/editRemainOrder"),
+
+  // course
+  createCourse: require("./course/createCourse"),
+  changeStatusCourse: require("./course/changeStatusCourse"),
 };

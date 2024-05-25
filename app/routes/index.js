@@ -1,7 +1,7 @@
 const controller = require("../controller");
 const middleware = require("../middleware/auth");
 
-module.exports = (app) => {
+module.exports = (app, io) => {
   // Auth
   app.post("/api/auth/create-account", controller.createAccount);
   app.post("/api/auth/login", controller.login);
@@ -53,5 +53,17 @@ module.exports = (app) => {
     "/api/order/disable-order",
     middleware.authorization,
     controller.disableOrder
+  );
+
+  // course
+  app.post(
+    "/api/course/create-course",
+    middleware.authorization,
+    controller.createCourse(io)
+  );
+  app.post(
+    "/api/course/change-status-course",
+    middleware.authorization,
+    controller.changeStatusCourse
   );
 };

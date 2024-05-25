@@ -11,7 +11,7 @@
  Target Server Version : 80036 (8.0.36)
  File Encoding         : 65001
 
- Date: 20/05/2024 21:53:21
+ Date: 25/05/2024 21:47:28
 */
 
 SET NAMES utf8mb4;
@@ -68,8 +68,9 @@ INSERT INTO `course_time` VALUES (9, '16:00 - 17:00');
 DROP TABLE IF EXISTS `courses`;
 CREATE TABLE `courses`  (
   `id` int NOT NULL AUTO_INCREMENT,
-  `order_id` int NULL DEFAULT NULL,
-  `course_time` int NULL DEFAULT NULL,
+  `order_id` int NOT NULL,
+  `course_time` int NOT NULL,
+  `course_date` date NOT NULL,
   `admin_accepted` int NULL DEFAULT 0 COMMENT '0 = Non Accepted; 1 = Accepted',
   `createdAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -78,12 +79,18 @@ CREATE TABLE `courses`  (
   INDEX `FK_Course_Time`(`course_time` ASC) USING BTREE,
   CONSTRAINT `FK_Course_Time` FOREIGN KEY (`course_time`) REFERENCES `course_time` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `FK_Order` FOREIGN KEY (`order_id`) REFERENCES `order` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 32 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of courses
 -- ----------------------------
-INSERT INTO `courses` VALUES (1, 3, 1, 1, '2024-05-20 21:21:22', '2024-05-20 21:37:23');
+INSERT INTO `courses` VALUES (25, 3, 2, '2024-01-01', 0, '2024-05-25 20:32:50', '2024-05-25 20:32:50');
+INSERT INTO `courses` VALUES (26, 3, 6, '2024-11-23', 0, '2024-05-25 20:36:03', '2024-05-25 20:36:03');
+INSERT INTO `courses` VALUES (27, 3, 6, '2024-05-26', 0, '2024-05-25 21:38:52', '2024-05-25 21:38:52');
+INSERT INTO `courses` VALUES (28, 3, 6, '2024-05-27', 0, '2024-05-25 21:39:12', '2024-05-25 21:39:12');
+INSERT INTO `courses` VALUES (29, 3, 6, '2024-05-25', 0, '2024-05-25 21:39:36', '2024-05-25 21:39:36');
+INSERT INTO `courses` VALUES (30, 3, 6, '2024-05-28', 0, '2024-05-25 21:39:55', '2024-05-25 21:39:55');
+INSERT INTO `courses` VALUES (31, 3, 6, '2024-05-26', 0, '2024-05-25 21:44:40', '2024-05-25 21:44:40');
 
 -- ----------------------------
 -- Table structure for order
@@ -107,7 +114,7 @@ CREATE TABLE `order`  (
 -- ----------------------------
 -- Records of order
 -- ----------------------------
-INSERT INTO `order` VALUES (3, 8, 4, 4, 1, '2024-05-20 21:04:22', '2024-05-20 21:39:47');
+INSERT INTO `order` VALUES (3, 8, 4, 1, 1, '2024-05-20 21:04:22', '2024-05-25 19:03:11');
 
 -- ----------------------------
 -- Table structure for package
@@ -239,14 +246,36 @@ CREATE PROCEDURE `change_status_course_by_admin`(IN `_course_id` INT,
 BEGIN
 
 	DECLARE _order_id INT;
-	
-	SELECT order_id INTO _order_id
+	DECLARE _admin_accepted INT;
+	 	
+	SELECT order_id, admin_accepted INTO _order_id, _admin_accepted
 	FROM `courses`
 	WHERE id = _course_id;
 	
-	UPDATE `courses` SET admin_accepted = _status_course WHERE id = _course_id;
+	IF _status_course = _admin_accepted THEN
 	
-	CALL accept_training_admin(_order_id);
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Status sudah sesuai';
+		
+	ELSE
+	
+		UPDATE `courses` SET admin_accepted = _status_course WHERE id = _course_id;
+		
+		IF _status_course = 0 THEN
+		
+				UPDATE 
+				`order` 
+				SET 
+				remaining_meet = remaining_meet + 1 
+				WHERE 
+				id = _order_id;
+				
+		ELSE
+		
+			CALL accept_training_admin(_order_id);
+			
+		END IF;
+		
+	END IF;
 
 END
 ;;
@@ -275,10 +304,11 @@ delimiter ;
 DROP PROCEDURE IF EXISTS `create_courses_by_account`;
 delimiter ;;
 CREATE PROCEDURE `create_courses_by_account`(IN `_order_id` INT,
-	IN `_course_time` INT)
+	IN `_course_time` INT,
+	IN `_course_date` DATE)
 BEGIN
 	
-	INSERT INTO courses (order_id, course_time) VALUES (_order_id, _course_time);
+	INSERT INTO courses (order_id, course_time, course_date) VALUES (_order_id, _course_time, _course_date);
 
 END
 ;;

@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const http = require("http");
 const server = http.createServer(app);
+const io = require("socket.io")(2800);
+
 require("./app/helper/autoload");
 
 const dotenv = require("dotenv");
@@ -49,11 +51,15 @@ app.use(function (req, res, next) {
 app.disable("x-powered-by");
 
 const routes = require("./app/routes");
+require("./app/routes/socketio");
 
-routes(app);
+routes(app, io);
 
 server.listen(port, ip, () => {
-  console.log(`${service} version ${version} listening on ${ip}:${port}`);
+  console.log(`${service} version ${version} API listening on ${ip}:${port}`);
+  console.log(
+    `${service} version ${version} Socket Io listening on ${ip}:2800`
+  );
 });
 
 module.exports = { app, server };
